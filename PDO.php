@@ -7,4 +7,4 @@
 	}catch(Exception $e){
 		die("Erreur co bdd" . $e->getMessage());
 	}
->
+?>
