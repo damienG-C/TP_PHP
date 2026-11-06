@@ -571,3 +571,16 @@ select {
         font-size: 0.85rem;
     }
 }
+
+
+/* Formulaire de déconnexion dans l'en-tête */
+.user-zone .logout-form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+.user-zone .logout-form button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}

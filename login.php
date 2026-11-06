@@ -133,7 +133,6 @@ require __DIR__ . '/header.php';
                 <input type="text" id="pseudo" name="pseudo" required minlength="3"  maxlength="50"
                 autocomplete="username"
                 value="<?= htmlspecialchars($_POST['pseudo'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-
                 <label for="mdp-inscription">Mot de passe</label>
                 <input type="password" id="mdp-inscription" name="mot_de_passe" required minlength="8"
                 autocomplete="new-password">
