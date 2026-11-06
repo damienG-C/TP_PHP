@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `user`(
     administrateur int(1),
     constraint pk_user primary key (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-insert INTO "user" (email, mdp, pseudo, administrateur) values('admin@localhost.fr', 'Admin69IUT', 'admin', 1);
+insert INTO `user` (email, mdp, pseudo, administrateur) values('admin@localhost.fr', '$2y$10$suYqzzXpxKk23k0EwLYX9uXqyOao02IAVzJkAomQlNzSqft6z9Miy', 'admin', 1);
 
 
 create table IF NOT EXISTS categorie(
