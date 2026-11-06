@@ -28,9 +28,10 @@ function getPseudosAuteurs(PDO $pdo): array
  *
  * @return array<int, array<string, mixed>>
  */
+
 function getArticles(PDO $pdo, string $pseudo = ''): array
 {
-    $sql = 'SELECT a.id, a.titre, a.description, a.pseudo,
+    $sql = 'SELECT a.id, a.id_auteur, a.titre, a.description, a.pseudo,
                    c.nom AS categories,
                    (SELECT COUNT(*) FROM commentaire co WHERE co.article = a.id) AS nb_commentaires
             FROM article a
@@ -51,6 +52,7 @@ function getArticles(PDO $pdo, string $pseudo = ''): array
 
     return $articles;
 }
+
 
 /**
  * Début d'un texte, pour l'aperçu dans la liste.
@@ -75,14 +77,17 @@ function lireIdArticle(): int
  *
  * @return array<string, mixed>|null
  */
+
 function getArticle(PDO $pdo, int $id): ?array
 {
     $stmt = $pdo->prepare(
-        'SELECT a.id, a.titre, a.description, a.pseudo, c.nom AS categorie
+        'SELECT a.id, a.id_auteur, a.titre, a.description, a.pseudo,
+                c.nom AS categorie
          FROM article a
          LEFT JOIN categorie c ON c.id = a.categorie
          WHERE a.id = :id'
     );
+
     $stmt->execute(['id' => $id]);
     $article = $stmt->fetch(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
@@ -90,25 +95,29 @@ function getArticle(PDO $pdo, int $id): ?array
     return $article === false ? null : $article;
 }
 
+
 /**
  * Commentaires d'un article, du plus ancien au plus récent.
  *
  * @return array<int, array<string, mixed>>
  */
+
 function getCommentaires(PDO $pdo, int $idArticle): array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, pseudo, description
+        'SELECT id, id_auteur, pseudo, description
          FROM commentaire
          WHERE article = :id
          ORDER BY id ASC'
     );
+
     $stmt->execute(['id' => $idArticle]);
     $commentaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
 
     return $commentaires;
 }
+
 
 /**
  * Lit le texte du formulaire de commentaire ('' si absent ou invalide).

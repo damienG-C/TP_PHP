@@ -12,7 +12,7 @@ $pseudo    = $_SESSION['pseudo'] ?? '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($titrePage) ?> - Mon Blog</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="site-header">
@@ -22,7 +22,7 @@ $pseudo    = $_SESSION['pseudo'] ?? '';
         <nav>
             <a href="index.php">Accueil</a>
             <?php if ($estConnecte): ?>
-                <a href="crea_arrticle.php">Nouvel article</a>
+                <a href="crea_article.php">Nouvel article</a>
                 <?php if ($estAdmin): ?>
                     <a href="admin/categories.php">Catégories</a>
                 <?php endif; ?>
@@ -36,7 +36,6 @@ $pseudo    = $_SESSION['pseudo'] ?? '';
             <?php else: ?>
                 <a href="login.php">Connexion</a>
             <?php endif; ?>
-            <?php echo password_hash('Admin69IUT', PASSWORD_DEFAULT);?>
         </div>
     </div>
 </header>

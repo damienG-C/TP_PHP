@@ -6,7 +6,7 @@ require_once 'fonctions_articles.php';
 
 authentification();
 
-//Traitement
+// Traitement
 $pseudos      = getPseudosAuteurs($pdo);
 $pseudoFiltre = lireFiltrePseudo();
 $erreurPseudo = '';
@@ -18,7 +18,7 @@ if ($pseudoFiltre !== '' && !in_array($pseudoFiltre, $pseudos, true)) {
 
 $articles = getArticles($pdo, $pseudoFiltre);
 
-//Affichage
+// Affichage
 $titrePage = 'Accueil';
 require 'header.php';
 ?>
@@ -36,9 +36,11 @@ require 'header.php';
         <?php endforeach; ?>
     </select>
     <button type="submit">Filtrer</button>
+
     <?php if ($pseudoFiltre !== ''): ?>
         <a href="index.php">Réinitialiser</a>
     <?php endif; ?>
+
     <?php if ($erreurPseudo !== ''): ?>
         <p class="error"><?= htmlspecialchars($erreurPseudo) ?></p>
     <?php endif; ?>
@@ -54,6 +56,7 @@ require 'header.php';
                     <?= htmlspecialchars($a['titre']) ?>
                 </a>
             </h2>
+
             <p class="meta">
                 Par
                 <a href="index.php?pseudo=<?= urlencode($a['pseudo']) ?>">
@@ -61,11 +64,27 @@ require 'header.php';
                 </a>
                 · <?= (int)$a['nb_commentaires'] ?> commentaire(s)
             </p>
+
             <?php if (!empty($a['categories'])): ?>
                 <p class="categories"><?= htmlspecialchars($a['categories']) ?></p>
             <?php endif; ?>
+
             <p><?= nl2br(htmlspecialchars(extrait($a['description']))) ?></p>
-            <a class="read-more" href="article.php?id=<?= (int)$a['id'] ?>">Lire la suite</a>
+
+            <a class="read-more" href="article.php?id=<?= (int)$a['id'] ?>">
+                Lire la suite
+            </a>
+
+            <?php if (
+                isset($_SESSION['user_id']) &&
+                (int)$_SESSION['user_id'] === (int)$a['id_auteur']
+            ): ?>
+                <form action="supprimer.php" method="POST" onsubmit="return confirm('Supprimer cet article ?');">
+                    <input type="hidden" name="type" value="article">
+                    <input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
+                </form>
+            <?php endif; ?>
+
         </article>
     <?php endforeach; ?>
 <?php endif; ?>

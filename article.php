@@ -22,7 +22,7 @@ if ($article === null) {
     exit(0);
 }
 
-// --- Ajout d'un commentaire (formulaire en POST) ---
+// --- Ajout d'un commentaire ---
 $texte  = '';
 $erreur = '';
 
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (string)$_SESSION['pseudo'],
             $texte
         );
-        // Redirection : évite le renvoi du formulaire si on recharge la page
+
         header('Location: article.php?id=' . $idArticle);
         exit(0);
     }
@@ -52,47 +52,105 @@ require 'header.php';
 ?>
 
 <article class="card">
+
     <h1><?= htmlspecialchars($article['titre']) ?></h1>
+
     <p class="meta">
         Par
         <a href="index.php?pseudo=<?= urlencode($article['pseudo']) ?>">
             <?= htmlspecialchars($article['pseudo']) ?>
         </a>
     </p>
+
     <?php if (!empty($article['categorie'])): ?>
-        <p class="categories"><?= htmlspecialchars($article['categorie']) ?></p>
+        <p class="categories">
+            <?= htmlspecialchars($article['categorie']) ?>
+        </p>
     <?php endif; ?>
+
     <p><?= nl2br(htmlspecialchars($article['description'])) ?></p>
+
+    <?php if (
+        isset($_SESSION['user_id']) &&
+        (
+            (int)$_SESSION['user_id'] === (int)$article['id_auteur']
+            || !empty($_SESSION['admin'])
+        )
+    ): ?>
+        <form action="supprimer.php" method="POST"
+              onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+
+            <input type="hidden" name="type" value="article">
+            <input type="hidden" name="id" value="<?= (int)$article['id'] ?>">
+
+            <button type="submit">Supprimer l'article</button>
+        </form>
+    <?php endif; ?>
+
 </article>
 
 <a class="back-link" href="index.php">&larr; Retour aux articles</a>
 
 <section class="comments">
+
     <h2>Commentaires (<?= count($commentaires) ?>)</h2>
 
     <?php if (empty($commentaires)): ?>
         <p class="empty">Aucun commentaire pour le moment.</p>
     <?php else: ?>
+
         <?php foreach ($commentaires as $c): ?>
             <div class="comment">
-                <p class="meta"><strong><?= htmlspecialchars($c['pseudo']) ?></strong></p>
+
+                <p class="meta">
+                    <strong><?= htmlspecialchars($c['pseudo']) ?></strong>
+                </p>
+
                 <p><?= nl2br(htmlspecialchars($c['description'])) ?></p>
+
+                <?php if (
+                    isset($_SESSION['user_id']) &&
+                    (
+                        (int)$_SESSION['user_id'] === (int)$c['id_auteur']
+                        || !empty($_SESSION['admin'])
+                    )
+                ): ?>
+                    <form action="supprimer.php" method="POST"
+                          onsubmit="return confirm('Voulez-vous vraiment supprimer ce commentaire ?');">
+
+                        <input type="hidden" name="type" value="commentaire">
+                        <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
+
+                        <button type="submit">Supprimer</button>
+                    </form>
+                <?php endif; ?>
+
             </div>
         <?php endforeach; ?>
+
     <?php endif; ?>
+
 </section>
 
 <section class="comment-form">
+
     <h2>Ajouter un commentaire</h2>
+
     <form method="post" action="article.php?id=<?= $idArticle ?>">
+
         <label for="commentaire">Votre commentaire :</label>
+
         <textarea name="commentaire" id="commentaire" rows="4" maxlength="1000" required
                   <?= $erreur !== '' ? 'autofocus' : '' ?>><?= htmlspecialchars($texte) ?></textarea>
+
         <?php if ($erreur !== ''): ?>
             <p class="error"><?= htmlspecialchars($erreur) ?></p>
         <?php endif; ?>
+
         <button type="submit">Publier</button>
+
     </form>
+
 </section>
 
 <?php require 'footer.php'; ?>
