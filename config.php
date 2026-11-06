@@ -20,3 +20,4 @@ function authentification(): void
         exit(0);
     }
 }
+?>

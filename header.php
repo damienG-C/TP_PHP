@@ -22,7 +22,7 @@ $pseudo    = $_SESSION['pseudo'] ?? '';
         <nav>
             <a href="index.php">Accueil</a>
             <?php if ($estConnecte): ?>
-                <a href="article_new.php">Nouvel article</a>
+                <a href="crea_arrticle.php">Nouvel article</a>
                 <?php if ($estAdmin): ?>
                     <a href="admin/categories.php">Catégories</a>
                 <?php endif; ?>
@@ -32,10 +32,11 @@ $pseudo    = $_SESSION['pseudo'] ?? '';
         <div class="user-zone">
             <?php if ($estConnecte): ?>
                 <span>Connecté : <strong><?= htmlspecialchars($pseudo) ?></strong></span>
-                <a href="logout.php">Déconnexion</a>
+                <a href="login.php">Déconnexion</a>
             <?php else: ?>
                 <a href="login.php">Connexion</a>
             <?php endif; ?>
+            <?php echo password_hash('Admin69IUT', PASSWORD_DEFAULT);?>
         </div>
     </div>
 </header>

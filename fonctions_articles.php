@@ -31,11 +31,10 @@ function getPseudosAuteurs(PDO $pdo): array
 function getArticles(PDO $pdo, string $pseudo = ''): array
 {
     $sql = 'SELECT a.id, a.titre, a.description, a.pseudo,
-                   GROUP_CONCAT(DISTINCT c.nom ORDER BY c.nom SEPARATOR \', \') AS categories,
+                   c.nom AS categories,
                    (SELECT COUNT(*) FROM commentaire co WHERE co.article = a.id) AS nb_commentaires
             FROM article a
-            LEFT JOIN article_categorie ac ON ac.article_id = a.id
-            LEFT JOIN categorie c ON c.id = ac.categorie_id';
+            LEFT JOIN categorie c ON c.id = a.categorie';
 
     $params = [];
     if ($pseudo !== '') {
@@ -43,8 +42,7 @@ function getArticles(PDO $pdo, string $pseudo = ''): array
         $params['pseudo'] = $pseudo;
     }
 
-    $sql .= ' GROUP BY a.id, a.titre, a.description, a.pseudo
-              ORDER BY a.id DESC';
+    $sql .= ' ORDER BY a.id DESC';
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -61,3 +59,96 @@ function extrait(string $texte, int $longueur = 250): string
 {
     return mb_strimwidth($texte, 0, $longueur, '…');
 }
+
+/**
+ * Lit l'identifiant d'article, vaut 0 si absent ou invalide.
+ */
+function lireIdArticle(): int
+{
+    $brut = $_GET['id'] ?? '';
+
+    return is_string($brut) && ctype_digit($brut) ? (int)$brut : 0;
+}
+
+/**
+ * Un article avec le nom de sa catégorie, ou null s'il n'existe pas.
+ *
+ * @return array<string, mixed>|null
+ */
+function getArticle(PDO $pdo, int $id): ?array
+{
+    $stmt = $pdo->prepare(
+        'SELECT a.id, a.titre, a.description, a.pseudo, c.nom AS categorie
+         FROM article a
+         LEFT JOIN categorie c ON c.id = a.categorie
+         WHERE a.id = :id'
+    );
+    $stmt->execute(['id' => $id]);
+    $article = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+    return $article === false ? null : $article;
+}
+
+/**
+ * Commentaires d'un article, du plus ancien au plus récent.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function getCommentaires(PDO $pdo, int $idArticle): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT id, pseudo, description
+         FROM commentaire
+         WHERE article = :id
+         ORDER BY id ASC'
+    );
+    $stmt->execute(['id' => $idArticle]);
+    $commentaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+
+    return $commentaires;
+}
+
+/**
+ * Lit le texte du formulaire de commentaire ('' si absent ou invalide).
+ */
+function lireTexteCommentaire(): string
+{
+    $brut = $_POST['commentaire'] ?? '';
+
+    return is_string($brut) ? trim($brut) : '';
+}
+
+/**
+ * Vérifie un commentaire. Renvoie le message d'erreur, ou '' si tout va bien.
+ */
+function validerCommentaire(string $texte): string
+{
+    if ($texte === '') {
+        return 'Le commentaire ne peut pas être vide.';
+    }
+    if (mb_strlen($texte) > 1000) {
+        return 'Le commentaire ne doit pas dépasser 1000 caractères.';
+    }
+
+    return '';
+}
+
+/**
+ * Enregistre un commentaire.
+ */
+function ajouterCommentaire(PDO $pdo, int $idArticle, int $idAuteur, string $pseudo, string $texte): void
+{
+    $stmt = $pdo->prepare(
+        'INSERT INTO commentaire (id_auteur, pseudo, article, description)
+         VALUES (:id_auteur, :pseudo, :article, :description)'
+    );
+    $stmt->execute([
+        'id_auteur'   => $idAuteur,
+        'pseudo'      => $pseudo,
+        'article'     => $idArticle,
+        'description' => $texte,
+    ]);
+}
+?>

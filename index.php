@@ -23,7 +23,7 @@ $titrePage = 'Accueil';
 require 'header.php';
 ?>
 
-<h1>Les articles</h1>
+<h1>Accueil</h1>
 
 <form method="get" class="filter-form">
     <label for="pseudo">Filtrer par auteur :</label>
