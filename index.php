@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once 'config.php';
 require_once 'fonctions_articles.php';
 
-requireLogin();
+authentification();
 
 //Traitement
 $pseudos      = getPseudosAuteurs($pdo);

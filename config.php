@@ -9,7 +9,8 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 //Connexion à la base
-require_once '/pdo.php';
+require_once __DIR__ . '/pdo.php';
+
 
 //Redirige vers la page de connexion si personne n'est connecté
 function authentification(): void
